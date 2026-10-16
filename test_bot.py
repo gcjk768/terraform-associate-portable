@@ -64,7 +64,7 @@ m = bot.metrics(st, now)
 assert m["week_n"] == 3 and m["week_ok"] == 2 and m["first_n"] == 3 and m["first_ok"] == 2
 assert 0 <= m["score"] <= 1000 and bot.verdict(m).startswith("⚪")
 txt = bot.report_text(m, now)
-assert "WEEKLY REPORT" in txt and "Predicted score" in txt and "READINESS" in txt and "750" in txt
+assert "WEEKLY REPORT" in txt and "Predicted score" in txt and "READINESS" in txt and str(bot.PASS) in txt
 many = [i for k, i in enumerate(bot.QUESTIONS) if k % 3]   # two of every three ids: spans all banks, >= 60 answers
 big = {**st, "log": [{"t": "2026-10-18T09:00", "id": i, "ok": True, "first": True} for i in many]}
 big["ok"] = {i: 1 for i in many}
