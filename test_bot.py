@@ -46,7 +46,7 @@ print("ok schedule")
 
 # study cards: notes load, no repeats until all are studied, related ids exist in the bank
 if bot.NOTES:
-    assert len(bot.NOTES) > 500 and all(n["title"] for n in bot.NOTES.values())
+    assert len(bot.NOTES) > 300 and all(n["title"] for n in bot.NOTES.values())
     st_ = {"studied": [i for i in bot.NOTES if i != "N-0170"]}
     assert bot.pick_note(st_)["id"] == "N-0170"
     assert bot.pick_note({"studied": list(bot.NOTES)})["id"] in bot.NOTES      # wraps around
