@@ -125,6 +125,19 @@ if os.path.exists(f):
         if opts and ans:
             add(clean(stem), opts, ",".join(ans), "", "certland.net free sample")
 
+# 6b. MCQs written by Claude from the flashcards (build_mcq.py): one JSON object per line, domain = the card's objective
+import json
+f = os.path.join(HERE, "sources", "mcq", "generated.jsonl")
+if os.path.exists(f):
+    for line in open(f, encoding="utf-8"):
+        try:
+            q = json.loads(line)
+        except Exception:
+            continue
+        opts = {L: (q.get("options") or {}).get(L, "") for L in "ABCD"}
+        if all(opts.values()) and q.get("correct") in list("ABCD") and q.get("question"):
+            add(q["question"], opts, q["correct"], q.get("explanation", ""), "MCQ written by Claude from a flashcard", q.get("domain"))
+
 # 7. Authored banks (AGENT format)
 for f in sorted(glob.glob(os.path.join(HERE, "banks", "*.md"))):
     t = open(f, encoding="utf-8").read()
