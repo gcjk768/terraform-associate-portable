@@ -125,10 +125,15 @@ if os.path.exists(f):
         if opts and ans:
             add(clean(stem), opts, ",".join(ans), "", "certland.net free sample")
 
-# 6b. MCQs written by Claude from the flashcards (build_mcq.py): one JSON object per line, domain = the card's objective
-import json
+# 6b. MCQs written by Claude from the flashcards (build_mcq.py): one JSON object per line, domain = the card's objective.
+# Once the blind solver has run (python build_mcq.py --verify) only the questions it agreed with go in; the rest stay in
+# generated.jsonl and are listed in sources/mcq/review.md.
+import json, sys
+sys.path.insert(0, HERE)          # python -I drops the script dir from sys.path
+import build_mcq
 f = os.path.join(HERE, "sources", "mcq", "generated.jsonl")
 if os.path.exists(f):
+    ok = build_mcq.verified_keys(); held = 0
     for line in open(f, encoding="utf-8"):
         try:
             q = json.loads(line)
@@ -136,7 +141,11 @@ if os.path.exists(f):
             continue
         opts = {L: (q.get("options") or {}).get(L, "") for L in "ABCD"}
         if all(opts.values()) and q.get("correct") in list("ABCD") and q.get("question"):
+            if ok is not None and build_mcq.qkey(q) not in ok:
+                held += 1; continue
             add(q["question"], opts, q["correct"], q.get("explanation", ""), "MCQ written by Claude from a flashcard", q.get("domain"))
+    print("generated MCQs: NOT VERIFIED YET, all included (run: python build_mcq.py --verify)" if ok is None else
+          f"generated MCQs: {held} held back as flagged, unverified or not checked yet (sources/mcq/review.md)")
 
 # 7. Authored banks (AGENT format)
 for f in sorted(glob.glob(os.path.join(HERE, "banks", "*.md"))):
